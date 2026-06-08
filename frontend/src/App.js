@@ -120,7 +120,7 @@ function App() {
             <p className="subtitle">Powered by Gemma 4 31B</p>
           </div>
           <div className="header-buttons">
-            <button onClick={createNewSession} className="new-chat-btn" title="Start a new conversation">
+            <button onClick={createNewSession} className="new-chat-btn" title="Staart a new conversation">
               ➕ New Chat
             </button>
             <button onClick={clearChat} className="clear-btn" title="Clear current chat">
