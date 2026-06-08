@@ -1,0 +1,90 @@
+name: Test CloudChat AI
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Test backend imports
+      working-directory: ./backend
+      run: |
+        python -c "
+        import sys
+        try:
+            from main import app
+            print('✅ Backend imports successfully')
+        except Exception as e:
+            print(f'❌ Import failed: {e}')
+            sys.exit(1)
+        "
+    
+    - name: Check API structure
+      working-directory: ./backend
+      run: |
+        python -c "
+        from main import app
+        routes = [route.path for route in app.routes]
+        assert '/chat' in routes, 'Chat endpoint missing'
+        assert '/health' in routes, 'Health endpoint missing'
+        print('✅ All endpoints found')
+        "
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build
+    
+    - name: Check for API URL
+      working-directory: ./frontend/src
+      run: |
+        if grep -q "localhost" App.js; then
+          echo "⚠️ Warning: localhost found in App.js"
+        else
+          echo "✅ API URL looks good"
+        fi
+
+  test-docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Test Docker build
+      run: |
+        cd backend
+        docker build -t test-backend .
+        cd ../frontend
+        docker build -t test-frontend .
+        echo "✅ Docker images build successfully"
