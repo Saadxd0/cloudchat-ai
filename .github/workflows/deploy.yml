@@ -33,7 +33,7 @@ jobs:
     - name: Test Frontend
       working-directory: ./frontend
       run: |
-        npm install
+        npm ci
         npm run build --if-present
         # Add tests when you have them
         # npm test
