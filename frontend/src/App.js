@@ -202,7 +202,7 @@ function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything... (Shift+Enter for new line)"
+              placeholder="Ask me anything... (Press Shift+Enter for new line)"
               rows="3"
               disabled={loading}
               className="chat-input"
