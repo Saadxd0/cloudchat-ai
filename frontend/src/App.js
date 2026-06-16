@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 
+// Same-origin API base. nginx reverse-proxies /api to the backend in
+// production, so no host/IP is hardcoded. Override with REACT_APP_API_URL.
+const API_BASE = process.env.REACT_APP_API_URL || '/api';
+
 function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -54,7 +58,7 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/chat', {
+      const response = await axios.post(`${API_BASE}/chat`, {
         message: input,
         session_id: sessionId,
         temperature: 0.7,
@@ -97,7 +101,7 @@ function App() {
   const clearChat = async () => {
     if (sessionId) {
       try {
-        await axios.delete(`http://localhost:8000/history/${sessionId}`);
+        await axios.delete(`${API_BASE}/history/${sessionId}`);
       } catch (error) {
         console.error('Error clearing history:', error);
       }
